@@ -164,6 +164,14 @@ func (c *Cache) Len() int {
 	return c.ll.Len()
 }
 
+// Flush remove all the keys in cache
+func (c *Cache) Flush() {
+	c.Lock()
+	defer c.Unlock()
+	c.ll = list.New()
+	c.cache = make(map[interface{}]*list.Element)
+}
+
 // Keys return all the keys in cache
 func (c *Cache) Keys() []interface{} {
 	c.RLock()
@@ -194,10 +202,20 @@ func (c *Cache) Values() []interface{} {
 	return values
 }
 
-// Flush remove all the keys in cache
-func (c *Cache) Flush() {
+// Check if the key exists
+func (c *Cache) IsExist(key Key) (ok bool) {
 	c.Lock()
 	defer c.Unlock()
-	c.ll = list.New()
-	c.cache = make(map[interface{}]*list.Element)
+	if c.cache == nil {
+		return
+	}
+	if ele, hit := c.cache[key]; hit {
+		if ele.Value.(*entry).isExpired() {
+			// delete expired elem
+			c.removeElement(ele)
+			return
+		}
+		return hit
+	}
+	return
 }

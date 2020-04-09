@@ -17,6 +17,8 @@ func TestGet(t *testing.T) {
 	fmt.Println(lru.Get(8))
 	fmt.Println(lru.Keys())
 	fmt.Println(lru.Values())
+	fmt.Println(lru.IsExist(3))
+	fmt.Println(lru.IsExist(8))
 	lru.Flush()
 	fmt.Println(lru.Len())
 	fmt.Println(lru.Keys())
